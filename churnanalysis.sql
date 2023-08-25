@@ -79,3 +79,83 @@ ORDER BY Churn_Rate DESC
 LIMIT 5;
 
 --
+
+-- Why did customers leave?
+
+SELECT 
+  Churn_Category,
+  ROUND(SUM(Total_Revenue),0) AS Churned_Revenue,
+  CEIL(COUNT(Customer_ID)*100/SUM(COUNT(Customer_ID))OVER()) AS Churn_Percentage
+FROM `serious-sql-394805.Churn_Analysis123.Telecom_Churn_Analysis`
+WHERE Customer_Status = 'Churned'
+GROUP BY Churn_Category
+ORDER BY Churn_Percentage DESC;
+
+--Specific Reasons For Churn
+-- why exactly did customers churn?
+
+SELECT 
+  Churn_Reason,
+  Churn_Category,
+  ROUND(COUNT(Customer_ID)*100/SUM (COUNT(Customer_ID))OVER(),1) AS Churn_Percentage
+FROM `serious-sql-394805.Churn_Analysis123.Telecom_Churn_Analysis`
+WHERE Customer_Status = 'Churned'
+GROUP BY 
+Churn_Reason,Churn_Category
+ORDER BY Churn_Percentage DESC
+LIMIT 7;
+
+-- What offers did churners have?
+
+SELECT 
+  Offer,
+  ROUND(COUNT(Customer_ID)*100/SUM (COUNT(Customer_ID))OVER(),1) AS Churn_Percentage
+FROM `serious-sql-394805.Churn_Analysis123.Telecom_Churn_Analysis`
+WHERE Customer_Status = 'Churned'
+GROUP BY Offer
+ORDER BY Churn_Percentage DESC;
+
+-- What Internet Type did churners have?
+SELECT 
+  Internet_Type,
+  Count(Customer_ID) AS Churned,
+  ROUND(COUNT(Customer_ID)*100/SUM (COUNT(Customer_ID))OVER(),1) AS Churn_Percentage
+FROM `serious-sql-394805.Churn_Analysis123.Telecom_Churn_Analysis`
+WHERE Customer_Status = 'Churned'
+GROUP BY Internet_Type
+ORDER BY Churn_Percentage DESC;
+
+-- What Internet Type did 'Competitor' churners have?
+SELECT 
+  Internet_Type,
+  Count(Customer_ID) AS Churned,
+  ROUND(COUNT(Customer_ID)*100/SUM (COUNT(Customer_ID))OVER(),1) AS Churn_Percentage
+FROM `serious-sql-394805.Churn_Analysis123.Telecom_Churn_Analysis`
+WHERE Customer_Status = 'Churned' AND Churn_Category = 'Competitor'
+GROUP BY Internet_Type
+ORDER BY Churn_Percentage DESC;
+
+-- Did churners have premium tech support?
+
+SELECT 
+  Premium_Tech_Support,
+  Count(Customer_ID) AS Churned,
+  ROUND(COUNT(Customer_ID)*100/SUM (COUNT(Customer_ID))OVER(),1) AS Churn_Percentage
+FROM `serious-sql-394805.Churn_Analysis123.Telecom_Churn_Analysis`
+WHERE Customer_Status = 'Churned'
+GROUP BY   Premium_Tech_Support
+ORDER BY Churned DESC;
+
+-- What contract were churners on?
+
+SELECT 
+  Contract,
+  Count(Customer_ID) AS Churned,
+  ROUND(COUNT(Customer_ID)*100/SUM (COUNT(Customer_ID))OVER(),1) AS Churn_Percentage
+FROM `serious-sql-394805.Churn_Analysis123.Telecom_Churn_Analysis`
+WHERE Customer_Status = 'Churned'
+GROUP BY Contract
+ORDER BY Churned DESC;
+
+
+---6. Are high value customers at risk of churning?
