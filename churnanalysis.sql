@@ -159,3 +159,123 @@ ORDER BY Churned DESC;
 
 
 ---6. Are high value customers at risk of churning?
+
+SELECT 
+  CASE
+    WHEN (num_conditions >= 3) THEN 'High_Risk'
+    WHEN (num_conditions = 2) THEN 'Medium_Risk'
+    ELSE 'Low_Risk'
+    END AS Risk_Levels,
+    COUNT(Customer_ID) AS Num_Customers,
+    ROUND(COUNT(Customer_ID)*100/SUM(COUNT(Customer_ID))OVER (),1) AS Cust_Percentage,
+    num_conditions
+FROM 
+(
+  SELECT
+    Customer_ID,
+    SUM(CASE WHEN Offer ='Offer E' OR Offer = 'None' THEN 1 ELSE 0 END)+
+    SUM(CASE WHEN Contract = 'Month-to-Month' THEN 1 ELSE 0 END)+
+    SUM(CASE WHEN Premium_Tech_Support = false THEN 1 ELSE 0 END)+
+    SUM(CASE WHEN Internet_Type = 'Fiber Optic' THEN 1 ELSE 0 END)
+    AS num_conditions
+  FROM `serious-sql-394805.Churn_Analysis123.Telecom_Churn_Analysis`
+  WHERE
+    Tenure_in_Months > 6 
+    AND Monthly_Charge > 70.05
+    AND Number_of_Referrals > 0
+    AND Customer_Status = 'Stayed'
+  GROUP BY Customer_ID
+  HAVING num_conditions >=1
+) AS subquery
+GROUP BY
+  Risk_Levels,
+  num_conditions
+;
+
+--Churn Demographics
+
+-- HOW old were churners?
+
+SELECT 
+  CASE
+       WHEN Age <= 30 THEN '19-30 Years'
+       WHEN Age <= 40 THEN '31-40 Years'
+       WHEN Age <= 50 THEN '41-50 Years'
+       WHEN Age <= 60 THEN '51-60 Years'
+  ELSE '>60 Years'
+  END AS Age,
+  ROUND(COUNT(Customer_ID)*100/SUM(COUNT(Customer_ID))OVER(),1) AS Churn_Percentage
+FROM `serious-sql-394805.Churn_Analysis123.Telecom_Churn_Analysis`
+WHERE 
+  Customer_Status = 'Churned'
+GROUP BY Age
+ORDER BY Churn_Percentage DESC;
+
+-- What gender were churners?
+
+SELECT 
+  Gender,
+  ROUND(COUNT(Customer_ID)*100/SUM(COUNT(Customer_ID))OVER(),1) AS Churn_Percentage
+FROM `serious-sql-394805.Churn_Analysis123.Telecom_Churn_Analysis`
+WHERE 
+  Customer_Status = 'Churned'
+GROUP BY Gender
+ORDER BY Churn_Percentage DESC; 
+
+-- Did churners have dependents
+
+SELECT 
+  CASE
+  WHEN Number_of_Dependents> 0 THEn 'Has Dependents'
+  ELSE 'No Dependents'
+  END AS dependents,
+  ROUND(COUNT(Customer_ID)*100/SUM(COUNT(Customer_ID))OVER(),1) AS Churn_Percentage
+FROM `serious-sql-394805.Churn_Analysis123.Telecom_Churn_Analysis`
+WHERE 
+  Customer_Status = 'Churned'
+GROUP BY dependents
+ORDER BY Churn_Percentage DESC; 
+
+-- Were churners married
+
+SELECT 
+    Married,
+    ROUND(COUNT(Customer_ID)*100/SUM(COUNT(Customer_ID))OVER(),1) AS Churn_Percentage
+FROM `serious-sql-394805.Churn_Analysis123.Telecom_Churn_Analysis`
+WHERE 
+  Customer_Status = 'Churned'
+GROUP BY Married
+ORDER BY Churn_Percentage DESC;
+
+-- Do churners have phone lines
+SELECT 
+  Phone_Service,
+  ROUND(COUNT(Customer_ID)*100/SUM(COUNT(Customer_ID))OVER(),1) AS Churn_Percentage
+FROM `serious-sql-394805.Churn_Analysis123.Telecom_Churn_Analysis`
+WHERE 
+  Customer_Status = 'Churned'
+GROUP BY Phone_Service
+ORDER BY Churn_Percentage DESC;
+
+-- Do churners have internet service
+
+SELECT 
+  Internet_Service,
+  ROUND(COUNT(Customer_ID)*100/SUM(COUNT(Customer_ID))OVER(),1) AS Churn_Percentage
+FROM `serious-sql-394805.Churn_Analysis123.Telecom_Churn_Analysis`
+WHERE 
+  Customer_Status = 'Churned'
+GROUP BY Internet_Service
+ORDER BY Churn_Percentage DESC;
+
+-- Did they give referrals
+SELECT 
+  CASE WHEN Number_of_Referrals >0 THEN 'Yes'
+  ELSE 'No'
+  END AS Referrals,
+  ROUND(COUNT(Customer_ID)*100/SUM(COUNT(Customer_ID))OVER(),1) AS Churn_Percentage
+FROM `serious-sql-394805.Churn_Analysis123.Telecom_Churn_Analysis`
+WHERE 
+  Customer_Status = 'Churned'
+GROUP BY Referrals
+ORDER BY Churn_Percentage DESC;
