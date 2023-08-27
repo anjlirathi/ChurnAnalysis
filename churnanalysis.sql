@@ -269,6 +269,7 @@ GROUP BY Internet_Service
 ORDER BY Churn_Percentage DESC;
 
 -- Did they give referrals
+
 SELECT 
   CASE WHEN Number_of_Referrals >0 THEN 'Yes'
   ELSE 'No'
@@ -279,3 +280,5 @@ WHERE
   Customer_Status = 'Churned'
 GROUP BY Referrals
 ORDER BY Churn_Percentage DESC;
+
+
