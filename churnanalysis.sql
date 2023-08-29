@@ -281,4 +281,16 @@ WHERE
 GROUP BY Referrals
 ORDER BY Churn_Percentage DESC;
 
+-- Preparing Dashboard
+
+SELECT 
+ COUNT(Customer_ID) AS Churned,
+ ROUND(COUNT(
+    CASE 
+      WHEN Customer_Status ='Churned' THEN Customer_ID ELSE NULL END ) * 100/ Count(Customer_ID),1) AS Churn_Rate,
+ ROUND(SUM(Total_Revenue)/COUNT(Customer_ID),1) AS ARPU,
+ ROUND(SUM(Tenure_in_Months)/COUNT(Customer_ID),1) AS AVG_Tenure_in_Months
+FROM `serious-sql-394805.Churn_Analysis123.Telecom_Churn_Analysis` 
+;
+
 
